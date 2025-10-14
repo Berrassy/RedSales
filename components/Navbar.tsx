@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -87,12 +88,16 @@ export default function Navbar() {
       {/* Top section */}
       <div className="flex items-center justify-between px-8 py-4">
         {/* Logo */}
-        <Link
-          href="/"
-          className="text-2xl font-semibold tracking-wider uppercase transition-colors hover:text-[#0E3B2C]"
-        >
-          Sketch Design
-        </Link>
+        <div className="flex items-center">
+          <Image
+            src="/images/sketchlogo.svg"
+            alt="Sketch Design"
+            width={180}
+            height={60}
+            priority
+            className="h-auto w-auto max-h-[60px]"
+          />
+        </div>
 
         {/* Search bar */}
         <div className="hidden md:flex items-center w-1/3 relative">
@@ -117,8 +122,14 @@ export default function Navbar() {
             </SheetTrigger>
             <SheetContent side="left" className="bg-[#1F1F1F] border-[#2A2A2A] w-[300px]">
               <SheetHeader>
-                <SheetTitle className="text-white uppercase tracking-wider">
-                  Menu
+                <SheetTitle className="text-white flex items-center justify-start">
+                  <Image
+                    src="/images/sketchlogo.svg"
+                    alt="Sketch Design"
+                    width={150}
+                    height={50}
+                    className="h-auto w-auto max-h-[50px]"
+                  />
                 </SheetTitle>
               </SheetHeader>
               <div className="mt-8">
