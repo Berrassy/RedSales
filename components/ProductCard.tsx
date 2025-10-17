@@ -19,14 +19,6 @@ export default function ProductCard({ product }: ProductCardProps) {
     }).format(price);
   };
 
-  const getStockStatus = (stock: number) => {
-    if (stock === 0) return { text: "Rupture de stock", color: "text-red-500", bgColor: "bg-red-100" };
-    if (stock <= 3) return { text: `${stock} restant${stock > 1 ? "s" : ""}`, color: "text-orange-500", bgColor: "bg-orange-100" };
-    if (stock <= 10) return { text: `${stock} en stock`, color: "text-yellow-600", bgColor: "bg-yellow-100" };
-    return { text: "En stock", color: "text-green-500", bgColor: "bg-green-100" };
-  };
-
-  const stockStatus = getStockStatus(product.stock);
 
   return (
     <div className="group relative bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2">
@@ -107,49 +99,10 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
 
-        {/* Stock Status */}
+        {/* Stock Information */}
         <div className="mb-3">
-          <div className="flex items-center justify-between mb-2">
-            <div className={`px-3 py-1 rounded-full text-xs font-medium ${stockStatus.color} ${stockStatus.bgColor}`}>
-              {stockStatus.text}
-            </div>
-            {product.stock <= 3 && product.stock > 0 && (
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                <span className="text-xs text-orange-600 font-medium">LIMITÉ</span>
-              </div>
-            )}
-          </div>
-          
-          {/* Stock Bar */}
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className={`h-2 rounded-full transition-all duration-500 ${
-                product.stock === 0 ? 'bg-red-500' :
-                product.stock <= 3 ? 'bg-orange-500' :
-                product.stock <= 10 ? 'bg-yellow-500' : 'bg-green-500'
-              }`}
-              style={{ 
-                width: `${Math.min((product.stock / 20) * 100, 100)}%` 
-              }}
-            ></div>
-          </div>
-          
-          {/* City Information */}
-          <div className="text-xs text-gray-500 mt-1">
-            {product.stock > 0 ? (
-              <div className="flex items-center gap-1">
-                <span className="text-green-600">📍</span>
-                <span className="font-medium text-green-600">{product.primaryCity}</span>
-                {product.availableCities.length > 1 && (
-                  <span className="text-gray-400">
-                    (+{product.availableCities.length - 1} autres)
-                  </span>
-                )}
-              </div>
-            ) : (
-              <span className="text-red-500">❌ Indisponible</span>
-            )}
+          <div className="text-sm text-gray-600">
+            Stock: <span className="font-semibold text-gray-900">{product.stock}</span>
           </div>
         </div>
 
@@ -165,14 +118,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.stock === 0 ? "Rupture de stock" : "Ajouter au panier"}
         </button>
 
-        {/* Limited Offer Tag */}
-        {product.stock <= 3 && product.stock > 0 && (
-          <div className="mt-2 text-center">
-            <span className="inline-block bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-              ⚡ OFFRE LIMITÉE
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );
