@@ -1,15 +1,18 @@
 import Navbar from "@/components/Navbar";
 import ProductCard from "@/components/ProductCard";
-import { blackFridayProducts } from "@/lib/products";
+import { fetchBlackFridayProducts } from "@/lib/products";
 import { Clock, Zap, Gift, Star } from "lucide-react";
 
-export default function Home() {
+export default async function Home() {
+  const blackFridayProducts = await fetchBlackFridayProducts();
   const featuredProducts = blackFridayProducts.filter(p => p.isFeatured);
   const almostSoldOutProducts = blackFridayProducts.filter(p => p.isAlmostSoldOut);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
       <Navbar />
+      {/* Add padding to account for fixed navbar */}
+      <div className="pt-20">
       
       {/* Hero Section */}
       <section className="relative overflow-hidden">
@@ -107,6 +110,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </div>
     </main>
   );
 }

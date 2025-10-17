@@ -1,12 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Menu, X, Zap } from "lucide-react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const categories = [
     { name: "SALONS", href: "#" },
@@ -20,16 +32,25 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="w-full bg-gradient-to-r from-black via-gray-900 to-black text-white border-b border-red-500/20 relative z-50">
-      {/* Black Friday Banner */}
-      <div className="bg-gradient-to-r from-red-600 to-red-700 py-2 text-center">
-        <div className="flex items-center justify-center gap-2 text-sm font-bold animate-pulse">
-          <Zap className="w-4 h-4 text-yellow-400" />
-          <span className="text-yellow-400">BLACK FRIDAY</span>
-          <span className="text-white">- JUSQU&apos;À -50%</span>
-          <Zap className="w-4 h-4 text-yellow-400" />
-        </div>
-      </div>
+    <nav className="w-full bg-gradient-to-r from-black via-gray-900 to-black text-white border-b border-red-500/20 fixed top-0 left-0 right-0 z-50">
+      {/* Black Friday Banner with Animation */}
+      <AnimatePresence>
+        {!isScrolled && (
+          <motion.div 
+            initial={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="bg-gradient-to-r from-red-600 to-red-700 py-2 text-center overflow-hidden"
+          >
+            <div className="flex items-center justify-center gap-2 text-sm font-bold animate-pulse">
+              <Zap className="w-4 h-4 text-yellow-400" />
+              <span className="text-yellow-400">BLACK FRIDAY</span>
+              <span className="text-white">- JUSQU&apos;À -50%</span>
+              <Zap className="w-4 h-4 text-yellow-400" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Navigation */}
       <div className="container mx-auto px-4 py-4">
