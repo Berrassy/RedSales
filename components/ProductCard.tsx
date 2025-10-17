@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Product } from "@/lib/products";
 import { ShoppingCart, Heart, Eye } from "lucide-react";
 
@@ -60,9 +61,12 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Image Overlay on Hover */}
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
           <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 flex gap-2">
-            <button className="bg-white text-black p-2 rounded-full hover:bg-yellow-400 transition-colors duration-200 shadow-lg">
+            <Link 
+              href={`/product/${product.id}`}
+              className="bg-white text-black p-2 rounded-full hover:bg-yellow-400 transition-colors duration-200 shadow-lg"
+            >
               <Eye className="w-4 h-4" />
-            </button>
+            </Link>
             <button className="bg-white text-black p-2 rounded-full hover:bg-red-500 hover:text-white transition-colors duration-200 shadow-lg">
               <Heart className="w-4 h-4" />
             </button>
@@ -81,9 +85,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         </p>
 
         {/* Product Name */}
-        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-red-600 transition-colors duration-200">
-          {product.name}
-        </h3>
+        <Link href={`/product/${product.id}`}>
+          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-red-600 transition-colors duration-200 cursor-pointer">
+            {product.name}
+          </h3>
+        </Link>
 
         {/* Price Section */}
         <div className="mb-3">
