@@ -40,7 +40,7 @@ export default function ProtectedRoute({
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-lg">Vérification de l'authentification...</p>
+          <p className="text-white text-lg">Vérification de l&apos;authentification...</p>
         </div>
       </div>
     );
@@ -70,12 +70,12 @@ export default function ProtectedRoute({
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Accès refusé</h1>
-          <p className="text-gray-400 mb-6">Vous n'avez pas les permissions nécessaires pour accéder à cette page.</p>
+          <p className="text-gray-400 mb-6">Vous n&apos;avez pas les permissions nécessaires pour accéder à cette page.</p>
           <button
             onClick={() => router.push("/")}
             className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold transition-all duration-300"
           >
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </button>
         </div>
       </div>

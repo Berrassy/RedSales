@@ -158,12 +158,12 @@ export default function WishlistPage() {
               <p className="text-gray-500 mb-8">
                 Ajoutez vos produits préférés pour les retrouver facilement
               </p>
-              <a
+              <Link
                 href="/"
                 className="inline-block px-8 py-4 bg-gradient-to-r from-[#E50914] to-[#c40812] text-white font-bold hover:shadow-lg hover:shadow-[#E50914]/50 transition-all duration-300 transform hover:scale-105"
               >
                 Découvrir les produits
-              </a>
+              </Link>
             </motion.div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

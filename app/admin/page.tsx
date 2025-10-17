@@ -80,7 +80,7 @@ export default function AdminPage() {
             className="mt-12 text-center"
           >
             <p className="text-gray-500 text-sm">
-              Interface d'administration - Fonctionnalités à développer
+              Interface d&apos;administration - Fonctionnalités à développer
             </p>
           </motion.div>
         </div>
