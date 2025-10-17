@@ -47,7 +47,7 @@ export default function StickyWhatsAppButton({
   };
 
   const generateWhatsAppMessage = () => {
-    const message = `${WHATSAPP_CONFIG.DEFAULT_MESSAGE_TEMPLATE} "${productName}" au prix de ${formatPrice(productPrice)}. Pouvez-vous me donner plus d'informations ?`;
+    const message = `${WHATSAPP_CONFIG.DEFAULT_MESSAGE_TEMPLATE} "${productName}" au prix de ${formatPrice(productPrice)}. Pouvez-vous me donner plus d&apos;informations ?`;
     return message;
   };
 
