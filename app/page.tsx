@@ -24,7 +24,7 @@ export default function Home() {
             SOLDES EXCEPTIONNELS
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-            Jusqu'à <span className="text-red-500 font-bold text-3xl">-50%</span> sur toute la collection
+            Jusqu&apos;à <span className="text-red-500 font-bold text-3xl">-50%</span> sur toute la collection
           </p>
           <div className="flex items-center justify-center gap-4 text-yellow-400 mb-8">
             <Clock className="w-6 h-6 animate-spin" />

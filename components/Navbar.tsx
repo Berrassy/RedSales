@@ -26,7 +26,7 @@ export default function Navbar() {
         <div className="flex items-center justify-center gap-2 text-sm font-bold animate-pulse">
           <Zap className="w-4 h-4 text-yellow-400" />
           <span className="text-yellow-400">BLACK FRIDAY</span>
-          <span className="text-white">- JUSQU'À -50%</span>
+          <span className="text-white">- JUSQU&apos;À -50%</span>
           <Zap className="w-4 h-4 text-yellow-400" />
         </div>
       </div>
