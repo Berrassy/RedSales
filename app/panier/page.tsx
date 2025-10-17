@@ -10,9 +10,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function CartPage() {
-  const { cartItems, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
+  const { cartItems, removeItem, updateQuantity, cartTotal, cartCount } = useCart();
 
-  if (totalItems === 0) {
+  if (cartCount === 0) {
     return (
       <ProtectedRoute>
         <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black pt-32 pb-16">
@@ -55,7 +55,7 @@ export default function CartPage() {
           <div className="bg-white/10 backdrop-blur-lg border border-white/20 p-8">
             <h1 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
               <ShoppingCart className="w-8 h-8" />
-              Mon Panier ({totalItems} articles)
+              Mon Panier ({cartCount} articles)
             </h1>
 
             <div className="space-y-6">
@@ -81,9 +81,9 @@ export default function CartPage() {
                     <p className="text-gray-300 text-sm mb-2">{item.category}</p>
                     <div className="flex items-center gap-4">
                       <span className="text-red-400 font-bold text-lg">
-                        {item.price.toFixed(2)} MAD
+                        {item.discountedPrice.toFixed(2)} MAD
                       </span>
-                      {item.originalPrice && item.originalPrice > item.price && (
+                      {item.originalPrice && item.originalPrice > item.discountedPrice && (
                         <span className="text-gray-400 line-through text-sm">
                           {item.originalPrice.toFixed(2)} MAD
                         </span>
@@ -113,7 +113,7 @@ export default function CartPage() {
                     </div>
 
                     <Button
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeItem(item.id)}
                       size="sm"
                       className="w-8 h-8 p-0 bg-red-600 hover:bg-red-700 text-white"
                     >
@@ -129,7 +129,7 @@ export default function CartPage() {
               <div className="flex justify-between items-center mb-4">
                 <span className="text-xl font-semibold text-white">Total:</span>
                 <span className="text-2xl font-bold text-red-400">
-                  {totalPrice.toFixed(2)} MAD
+                  {cartTotal.total.toFixed(2)} MAD
                 </span>
               </div>
               
