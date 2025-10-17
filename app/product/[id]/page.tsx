@@ -4,13 +4,14 @@ import ProductDetailsPage from "@/components/ProductDetailsPage";
 import Navbar from "@/components/Navbar";
 
 interface ProductPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function ProductPage({ params }: ProductPageProps) {
-  const product = blackFridayProducts.find(p => p.id === params.id);
+export default async function ProductPage({ params }: ProductPageProps) {
+  const { id } = await params;
+  const product = blackFridayProducts.find(p => p.id === id);
 
   if (!product) {
     notFound();
@@ -33,7 +34,8 @@ export async function generateStaticParams() {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: ProductPageProps) {
-  const product = blackFridayProducts.find(p => p.id === params.id);
+  const { id } = await params;
+  const product = blackFridayProducts.find(p => p.id === id);
   
   if (!product) {
     return {
