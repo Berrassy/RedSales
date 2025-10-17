@@ -5,6 +5,11 @@ export const API_CONFIG = {
   FULL_URL: "https://ratio.sketchdesign.ma/ratio/fetch_products_new.php?type=category&query=Warehouse57-Temp&dateRange=4"
 };
 
+// WhatsApp Configuration
+export const WHATSAPP_CONFIG = {
+  PHONE_NUMBER: "212600000000", // Replace with your actual WhatsApp number (format: 212XXXXXXXXX)
+};
+
 // Image configuration
 export const IMAGE_CONFIG = {
   PLACEHOLDER_URL: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&h=400&fit=crop&q=80",

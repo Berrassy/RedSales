@@ -86,6 +86,7 @@ async function syncApiToDatabase() {
     // Fetch data from API
     const apiUrl = "https://ratio.sketchdesign.ma/ratio/fetch_products_new.php?type=category&query=Warehouse57-Temp&dateRange=4";
     console.log('📡 Fetching data from API...');
+    console.log(`🔗 API URL: ${apiUrl}`);
     
     const response = await fetch(apiUrl);
     

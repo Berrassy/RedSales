@@ -1,19 +1,28 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/products";
 import { ShoppingCart, Heart, Eye } from "lucide-react";
-import { useWishlist } from "@/lib/wishlist-context";
-import { motion } from "framer-motion";
+import { useWishlist } from "@/lib/hooks/useWishlist";
+import { useCart } from "@/lib/hooks/useCart";
+import Toast from "./Toast";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { addItem, removeItem, isItemInWishlist } = useWishlist();
+  const { addItem: addToCart } = useCart();
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+
+  useEffect(() => {
+    setIsInWishlist(isItemInWishlist(product.id));
+  }, [product.id, isItemInWishlist]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("fr-MA", {
@@ -23,33 +32,52 @@ export default function ProductCard({ product }: ProductCardProps) {
     }).format(price);
   };
 
-  const handleWishlistToggle = () => {
-    if (isInWishlist(product.id)) {
-      removeFromWishlist(product.id);
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isInWishlist) {
+      removeItem(product.id);
     } else {
-      addToWishlist(product);
+      addItem(product);
     }
   };
 
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsAdding(true);
+    addToCart(product, 1);
+    setShowToast(true);
+    
+    // Reset animation after a short delay
+    setTimeout(() => {
+      setIsAdding(false);
+    }, 600);
+  };
 
   return (
-    <div className="group relative bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2">
+    <>
+      <Toast
+        message="✅ Produit ajouté au panier!"
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+      />
+      
+      <div className="group relative bg-white shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2">
       {/* Featured Banner */}
       {product.isFeatured && (
-        <div className="absolute top-3 left-3 z-20 bg-gradient-to-r from-red-600 to-red-700 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
+        <div className="absolute top-3 left-3 z-20 bg-gradient-to-r from-red-600 to-red-700 text-white px-3 py-1 text-xs font-bold shadow-lg animate-pulse">
           ⭐ FEATURED
         </div>
       )}
 
       {/* Almost Sold Out Banner */}
       {product.isAlmostSoldOut && !product.isFeatured && (
-        <div className="absolute top-3 left-3 z-20 bg-gradient-to-r from-orange-600 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-bounce">
+        <div className="absolute top-3 left-3 z-20 bg-gradient-to-r from-orange-600 to-red-600 text-white px-3 py-1 text-xs font-bold shadow-lg animate-bounce">
           🔥 PRESQUE ÉPUISÉ
         </div>
       )}
 
       {/* Discount Badge */}
-      <div className="absolute top-3 right-3 z-20 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+      <div className="absolute top-3 right-3 z-20 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-3 py-1 text-sm font-bold shadow-lg">
         -{product.discountPercentage}%
       </div>
 
@@ -68,23 +96,24 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 flex gap-2">
             <Link 
               href={`/product/${product.id}`}
-              className="bg-white text-black p-2 rounded-full hover:bg-yellow-400 transition-colors duration-200 shadow-lg"
+              className="bg-white text-black p-2 hover:bg-yellow-400 transition-colors duration-200 shadow-lg"
             >
               <Eye className="w-4 h-4" />
             </Link>
-            <motion.button 
+            <button 
               onClick={handleWishlistToggle}
-              className={`p-2 rounded-full transition-colors duration-200 shadow-lg ${
-                isInWishlist(product.id) 
+              className={`p-2 transition-colors duration-200 shadow-lg ${
+                isInWishlist 
                   ? "bg-red-500 text-white" 
                   : "bg-white text-black hover:bg-red-500 hover:text-white"
               }`}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
             >
-              <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
-            </motion.button>
-            <button className="bg-white text-black p-2 rounded-full hover:bg-green-500 hover:text-white transition-colors duration-200 shadow-lg">
+              <Heart className={`w-4 h-4 ${isInWishlist ? "fill-white" : ""}`} />
+            </button>
+            <button 
+              onClick={handleAddToCart}
+              className="bg-white text-black p-2 hover:bg-green-500 hover:text-white transition-colors duration-200 shadow-lg"
+            >
               <ShoppingCart className="w-4 h-4" />
             </button>
           </div>
@@ -129,17 +158,20 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Add to Cart Button */}
         <button 
-          className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
+          onClick={handleAddToCart}
+          className={`w-full py-2 px-4 font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
             product.stock === 0 
               ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
               : "bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 hover:shadow-lg transform hover:scale-105"
-          }`}
+          } ${isAdding ? "scale-95" : ""}`}
           disabled={product.stock === 0}
         >
-          {product.stock === 0 ? "Rupture de stock" : "Ajouter au panier"}
+          <ShoppingCart className={`w-4 h-4 ${isAdding ? "animate-bounce" : ""}`} />
+          {product.stock === 0 ? "Rupture de stock" : isAdding ? "Ajouté!" : "Ajouter au panier"}
         </button>
 
       </div>
     </div>
+    </>
   );
 }

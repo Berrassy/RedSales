@@ -16,7 +16,7 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link 
             href="/"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-6 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             <Home className="w-5 h-5" />
             Retour à l&apos;accueil
@@ -24,7 +24,7 @@ export default function NotFound() {
           
           <Link 
             href="/"
-            className="inline-flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200"
+            className="inline-flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-6 transition-all duration-200"
           >
             <ArrowLeft className="w-5 h-5" />
             Voir tous les produits

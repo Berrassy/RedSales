@@ -37,6 +37,76 @@ export interface ApiProduct {
   "TotalSalesValue": number;
 }
 
+// Function to get the correct category based on API data
+function getCorrectCategory(apiCategory: string): string {
+  const category = apiCategory.toLowerCase();
+  
+  // Salon categories
+  if (category.includes('salon') || category.includes('canapé')) {
+    return 'Salons';
+  }
+  
+  // Canapé categories
+  if (category.includes('canapé 3 places') || category.includes('canapé 4 places')) {
+    return 'Canapés';
+  }
+  
+  // Table categories
+  if (category.includes('table basse') || category.includes('table de salle à manger') || category.includes('table d\'appoint') || category.includes('table de chevet')) {
+    return 'Tables';
+  }
+  
+  // Lit categories
+  if (category.includes('lit')) {
+    return 'Chambre';
+  }
+  
+  // Matelas categories
+  if (category.includes('matelas')) {
+    return 'Chambre';
+  }
+  
+  // Fauteuil categories
+  if (category.includes('fauteuil')) {
+    return 'Canapés';
+  }
+  
+  // Jardin/Extérieur categories
+  if (category.includes('jardin') || category.includes('exterieur') || category.includes('ensemble d\'exterieur') || category.includes('transat')) {
+    return 'Jardin';
+  }
+  
+  // Chaise categories
+  if (category.includes('chaise')) {
+    return 'Chaises';
+  }
+  
+  // Coussins categories
+  if (category.includes('coussins')) {
+    return 'Déco';
+  }
+  
+  // Default fallback
+  return 'Meubles';
+}
+
+// Generate a placeholder image URL based on product category
+function getImageUrl(category: string, productName: string) {
+  const correctCategory = getCorrectCategory(category);
+  
+  // Check if we have a specific image for this category
+  const categoryKey = Object.keys(IMAGE_CONFIG.CATEGORY_IMAGES).find(key => 
+    correctCategory.toUpperCase().includes(key)
+  );
+  
+  if (categoryKey) {
+    return IMAGE_CONFIG.CATEGORY_IMAGES[categoryKey as keyof typeof IMAGE_CONFIG.CATEGORY_IMAGES];
+  }
+  
+  // Default placeholder image
+  return IMAGE_CONFIG.PLACEHOLDER_URL;
+}
+
 // Function to transform API product to our Product interface
 function transformApiProduct(apiProduct: ApiProduct): Product {
   // Calculate original price (assuming 50% discount for Black Friday)
@@ -76,76 +146,6 @@ function transformApiProduct(apiProduct: ApiProduct): Product {
 
   const { availableCities, primaryCity } = getAvailableCities(apiProduct);
 
-  // Function to get the correct category based on API data
-  const getCorrectCategory = (apiCategory: string): string => {
-    const category = apiCategory.toLowerCase();
-    
-    // Salon categories
-    if (category.includes('salon') || category.includes('canapé')) {
-      return 'Salons';
-    }
-    
-    // Canapé categories
-    if (category.includes('canapé 3 places') || category.includes('canapé 4 places')) {
-      return 'Canapés';
-    }
-    
-    // Table categories
-    if (category.includes('table basse') || category.includes('table de salle à manger') || category.includes('table d\'appoint') || category.includes('table de chevet')) {
-      return 'Tables';
-    }
-    
-    // Lit categories
-    if (category.includes('lit')) {
-      return 'Chambre';
-    }
-    
-    // Matelas categories
-    if (category.includes('matelas')) {
-      return 'Chambre';
-    }
-    
-    // Fauteuil categories
-    if (category.includes('fauteuil')) {
-      return 'Canapés';
-    }
-    
-    // Jardin/Extérieur categories
-    if (category.includes('jardin') || category.includes('exterieur') || category.includes('ensemble d\'exterieur') || category.includes('transat')) {
-      return 'Jardin';
-    }
-    
-    // Chaise categories
-    if (category.includes('chaise')) {
-      return 'Chaises';
-    }
-    
-    // Coussins categories
-    if (category.includes('coussins')) {
-      return 'Déco';
-    }
-    
-    // Default fallback
-    return 'Meubles';
-  };
-
-  // Generate a placeholder image URL based on product category
-  const getImageUrl = (category: string, productName: string) => {
-    const correctCategory = getCorrectCategory(category);
-    
-    // Check if we have a specific image for this category
-    const categoryKey = Object.keys(IMAGE_CONFIG.CATEGORY_IMAGES).find(key => 
-      correctCategory.toUpperCase().includes(key)
-    );
-    
-    if (categoryKey) {
-      return IMAGE_CONFIG.CATEGORY_IMAGES[categoryKey as keyof typeof IMAGE_CONFIG.CATEGORY_IMAGES];
-    }
-    
-    // Default placeholder image
-    return IMAGE_CONFIG.PLACEHOLDER_URL;
-  };
-
   return {
     id: apiProduct["Ref. produit"],
     name: apiProduct["Libellé"],
@@ -175,7 +175,7 @@ function transformDbProduct(dbProduct: any): Product {
     stock: dbProduct.totalStock,
     isFeatured: dbProduct.isFeatured,
     isAlmostSoldOut: dbProduct.isAlmostSoldOut,
-    category: dbProduct.categorie,
+    category: getCorrectCategory(dbProduct.categorie), // Use correct category mapping
     description: dbProduct.description || `${dbProduct.libelle} - ${dbProduct.categorie}`,
     availableCities: dbProduct.availableCities,
     primaryCity: dbProduct.primaryCity
