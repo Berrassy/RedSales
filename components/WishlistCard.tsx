@@ -3,17 +3,18 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Product } from "@/lib/products";
-import { ShoppingCart, Heart, Eye } from "lucide-react";
-import { useWishlist } from "@/lib/wishlist-context";
 import { motion } from "framer-motion";
+import { Heart, Trash2, MessageCircle, Eye } from "lucide-react";
+import { Product } from "@/lib/products";
+import { useWishlist } from "@/lib/wishlist-context";
 
-interface ProductCardProps {
+interface WishlistCardProps {
   product: Product;
+  index: number;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+export default function WishlistCard({ product, index }: WishlistCardProps) {
+  const { removeFromWishlist } = useWishlist();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("fr-MA", {
@@ -23,35 +24,40 @@ export default function ProductCard({ product }: ProductCardProps) {
     }).format(price);
   };
 
-  const handleWishlistToggle = () => {
-    if (isInWishlist(product.id)) {
-      removeFromWishlist(product.id);
-    } else {
-      addToWishlist(product);
-    }
+  const handleWhatsAppOrder = () => {
+    const message = `Bonjour, je suis intéressé par ce produit: ${product.name} - ${formatPrice(product.discountedPrice)}`;
+    const whatsappUrl = `https://wa.me/212600000000?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
+  const handleRemoveFromWishlist = () => {
+    removeFromWishlist(product.id);
+  };
+
+  // Generate random viewer count
+  const viewerCount = Math.floor(Math.random() * 76) + 5; // 5-80 range
 
   return (
-    <div className="group relative bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2">
-      {/* Featured Banner */}
-      {product.isFeatured && (
-        <div className="absolute top-3 left-3 z-20 bg-gradient-to-r from-red-600 to-red-700 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
-          ⭐ FEATURED
-        </div>
-      )}
-
-      {/* Almost Sold Out Banner */}
-      {product.isAlmostSoldOut && !product.isFeatured && (
-        <div className="absolute top-3 left-3 z-20 bg-gradient-to-r from-orange-600 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-bounce">
-          🔥 PRESQUE ÉPUISÉ
-        </div>
-      )}
-
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20, scale: 0.95 }}
+      transition={{ duration: 0.3, delay: index * 0.1 }}
+      className="group relative bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2"
+    >
       {/* Discount Badge */}
       <div className="absolute top-3 right-3 z-20 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold shadow-lg">
         -{product.discountPercentage}%
       </div>
+
+      {/* Remove from Wishlist Button */}
+      <button
+        onClick={handleRemoveFromWishlist}
+        className="absolute top-3 left-3 z-20 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors duration-200 shadow-lg opacity-0 group-hover:opacity-100"
+        title="Retirer de la wishlist"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
 
       {/* Product Image */}
       <div className="relative h-64 overflow-hidden">
@@ -72,20 +78,12 @@ export default function ProductCard({ product }: ProductCardProps) {
             >
               <Eye className="w-4 h-4" />
             </Link>
-            <motion.button 
-              onClick={handleWishlistToggle}
-              className={`p-2 rounded-full transition-colors duration-200 shadow-lg ${
-                isInWishlist(product.id) 
-                  ? "bg-red-500 text-white" 
-                  : "bg-white text-black hover:bg-red-500 hover:text-white"
-              }`}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+            <button 
+              onClick={handleWhatsAppOrder}
+              className="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors duration-200 shadow-lg"
+              title="Commander par WhatsApp"
             >
-              <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
-            </motion.button>
-            <button className="bg-white text-black p-2 rounded-full hover:bg-green-500 hover:text-white transition-colors duration-200 shadow-lg">
-              <ShoppingCart className="w-4 h-4" />
+              <MessageCircle className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -123,23 +121,34 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Stock Information */}
         <div className="mb-3">
           <div className="text-sm text-gray-600">
-            Stock: <span className="font-semibold text-gray-900">{product.stock}</span>
+            Stock: <span className={`font-semibold ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {product.stock > 0 ? 'En stock' : 'Rupture de stock'}
+            </span>
           </div>
         </div>
 
-        {/* Add to Cart Button */}
+        {/* Viewer Count */}
+        <div className="mb-3">
+          <div className="text-xs text-gray-500 flex items-center gap-1">
+            <Eye className="w-3 h-3" />
+            <span>{viewerCount} personnes ont ajouté ce produit aujourd'hui</span>
+          </div>
+        </div>
+
+        {/* WhatsApp Order Button */}
         <button 
-          className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
+          onClick={handleWhatsAppOrder}
+          className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
             product.stock === 0 
               ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-              : "bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 hover:shadow-lg transform hover:scale-105"
+              : "bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 hover:shadow-lg transform hover:scale-105"
           }`}
           disabled={product.stock === 0}
         >
-          {product.stock === 0 ? "Rupture de stock" : "Ajouter au panier"}
+          <MessageCircle className="w-4 h-4" />
+          {product.stock === 0 ? "Rupture de stock" : "Commander par WhatsApp"}
         </button>
-
       </div>
-    </div>
+    </motion.div>
   );
 }

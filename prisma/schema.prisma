@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id                String   @id @default(cuid())
+  refProduit        String   @unique @map("ref_produit")
+  libelle           String   @map("libelle")
+  categorie         String   @map("categorie")
+  prixPromo         Float    @map("prix_promo")
+  originalPrice     Float    @map("original_price")
+  discountPercentage Int     @map("discount_percentage")
+  totalStock        Int      @map("total_stock")
+  totalSales        Int      @map("total_sales")
+  totalSalesValue   Float    @map("total_sales_value")
+  ratioSKE          String?  @map("ratio_ske")
+  ratioTotal        String?  @map("ratio_total")
+  isFeatured        Boolean  @default(false) @map("is_featured")
+  isAlmostSoldOut   Boolean  @default(false) @map("is_almost_sold_out")
+  image             String?
+  description       String?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Stock by location
+  stockFrimoda      Int      @default(0) @map("stock_frimoda")
+  stockCasa         Int      @default(0) @map("stock_casa")
+  stockRabat        Int      @default(0) @map("stock_rabat")
+  stockMarrakech    Int      @default(0) @map("stock_marrakech")
+  stockTanger       Int      @default(0) @map("stock_tanger")
+  stockBouskoura    Int      @default(0) @map("stock_bouskoura")
+  stockWarehouse57  Int      @default(0) @map("stock_warehouse57")
+
+  // Computed fields for available cities
+  availableCities   String[] @default([]) @map("available_cities")
+  primaryCity       String?  @map("primary_city")
+
+  // Relations (optional for now)
+  // category          Category? @relation(fields: [categorie], references: [name])
+
+  @@map("products")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  image       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
+
+model City {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  code      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("cities")
+}
+
+model ApiSync {
+  id          String   @id @default(cuid())
+  lastSync    DateTime @map("last_sync")
+  totalProducts Int    @map("total_products")
+  success     Boolean  @default(false)
+  errorMessage String? @map("error_message")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("api_syncs")
+}

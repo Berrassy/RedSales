@@ -2,13 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Menu, X, Zap } from "lucide-react";
+import { Menu, X, Zap, Heart } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useWishlist } from "@/lib/wishlist-context";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { wishlistCount } = useWishlist();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -80,6 +82,23 @@ export default function Navbar() {
               </Link>
             ))}
           </div>
+
+          {/* Wishlist Button */}
+          <Link
+            href="/wishlist"
+            className="relative p-2 text-white hover:text-red-400 transition-colors duration-200"
+          >
+            <Heart className="w-6 h-6" />
+            {wishlistCount > 0 && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
+              >
+                {wishlistCount}
+              </motion.div>
+            )}
+          </Link>
 
           {/* Mobile Menu Button */}
           <button

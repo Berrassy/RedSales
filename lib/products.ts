@@ -1,4 +1,5 @@
 import { API_CONFIG, IMAGE_CONFIG } from './config';
+import { prisma } from './prisma';
 
 export interface Product {
   id: string;
@@ -162,27 +163,51 @@ function transformApiProduct(apiProduct: ApiProduct): Product {
   };
 }
 
-// Function to fetch products from API
+// Function to transform database product to our Product interface
+function transformDbProduct(dbProduct: any): Product {
+  return {
+    id: dbProduct.refProduit,
+    name: dbProduct.libelle,
+    originalPrice: dbProduct.originalPrice,
+    discountedPrice: dbProduct.prixPromo,
+    discountPercentage: dbProduct.discountPercentage,
+    image: getImageUrl(dbProduct.categorie, dbProduct.libelle),
+    stock: dbProduct.totalStock,
+    isFeatured: dbProduct.isFeatured,
+    isAlmostSoldOut: dbProduct.isAlmostSoldOut,
+    category: dbProduct.categorie,
+    description: dbProduct.description || `${dbProduct.libelle} - ${dbProduct.categorie}`,
+    availableCities: dbProduct.availableCities,
+    primaryCity: dbProduct.primaryCity
+  };
+}
+
+// Function to fetch products from database
 export async function fetchBlackFridayProducts(): Promise<Product[]> {
   try {
-    const response = await fetch(API_CONFIG.FULL_URL);
+    console.log('📦 Fetching products from database...');
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    const dbProducts = await prisma.product.findMany({
+      where: {
+        totalStock: {
+          gt: 0 // Only products with stock
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: 50 // Limit to 50 products for performance
+    });
     
-    const apiProducts: ApiProduct[] = await response.json();
+    console.log(`✅ Found ${dbProducts.length} products in database`);
     
-    // Transform API products to our format
-    const products = apiProducts
-      .filter(apiProduct => apiProduct["Total Stock"] > 0) // Only products with stock
-      .map(transformApiProduct)
-      .slice(0, 20); // Limit to 20 products for performance
+    // Transform database products to our format
+    const products = dbProducts.map(transformDbProduct);
     
     return products;
   } catch (error) {
-    console.error('Error fetching products:', error);
-    // Return fallback static products if API fails
+    console.error('Error fetching products from database:', error);
+    // Return fallback static products if database fails
     return getFallbackProducts();
   }
 }

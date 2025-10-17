@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { WishlistProvider } from "@/lib/wishlist-context";
 
 export const metadata: Metadata = {
   title: "Sketch Design Maroc - Mobilier de Luxe",
@@ -14,7 +15,9 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="antialiased">
-        {children}
+        <WishlistProvider>
+          {children}
+        </WishlistProvider>
       </body>
     </html>
   );
