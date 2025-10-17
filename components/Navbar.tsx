@@ -26,7 +26,6 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const categories = [
-    { name: "PACKS PROMO", href: "#" },
     {
       name: "SALONS",
       sub: [
