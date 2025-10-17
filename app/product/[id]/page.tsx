@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { blackFridayProducts } from "@/lib/products";
+import { fetchBlackFridayProducts } from "@/lib/products";
 import ProductDetailsPage from "@/components/ProductDetailsPage";
 import Navbar from "@/components/Navbar";
 
@@ -11,6 +11,7 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params;
+  const blackFridayProducts = await fetchBlackFridayProducts();
   const product = blackFridayProducts.find(p => p.id === id);
 
   if (!product) {
@@ -27,6 +28,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
 // Generate static params for all products
 export async function generateStaticParams() {
+  const blackFridayProducts = await fetchBlackFridayProducts();
   return blackFridayProducts.map((product) => ({
     id: product.id,
   }));
@@ -35,6 +37,7 @@ export async function generateStaticParams() {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: ProductPageProps) {
   const { id } = await params;
+  const blackFridayProducts = await fetchBlackFridayProducts();
   const product = blackFridayProducts.find(p => p.id === id);
   
   if (!product) {

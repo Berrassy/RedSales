@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Product } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
-import { blackFridayProducts } from "@/lib/products";
+import { fetchBlackFridayProducts } from "@/lib/products";
 import { 
   ShoppingCart, 
   Heart, 
@@ -26,11 +26,30 @@ export default function ProductDetailsPage({ product }: ProductDetailsPageProps)
   const [selectedImage, setSelectedImage] = useState(product.image);
   const [viewCount, setViewCount] = useState(0);
   const [isImageZoomed, setIsImageZoomed] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
 
   // Generate random view count on component mount
   useEffect(() => {
     setViewCount(Math.floor(Math.random() * (300 - 15 + 1)) + 15);
   }, []);
+
+  // Fetch related products
+  useEffect(() => {
+    const loadRelatedProducts = async () => {
+      try {
+        const allProducts = await fetchBlackFridayProducts();
+        const related = allProducts
+          .filter(p => p.category === product.category && p.id !== product.id)
+          .slice(0, 4);
+        setRelatedProducts(related);
+      } catch (error) {
+        console.error('Error fetching related products:', error);
+        setRelatedProducts([]);
+      }
+    };
+    
+    loadRelatedProducts();
+  }, [product.category, product.id]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("fr-MA", {
@@ -69,13 +88,8 @@ export default function ProductDetailsPage({ product }: ProductDetailsPageProps)
   const stockStatus = getStockStatus(product.stock);
   const StockIcon = stockStatus.icon;
 
-  // Get related products (same category, excluding current product)
-  const relatedProducts = blackFridayProducts
-    .filter(p => p.category === product.category && p.id !== product.id)
-    .slice(0, 4);
-
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
+    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 pt-20">
       {/* Back Button */}
       <div className="container mx-auto px-4 pt-6">
         <Link 

@@ -67,15 +67,6 @@ export default function SignInPage() {
         transition={{ duration: 0.5 }}
         className="relative w-full max-w-md"
       >
-        {/* Black Friday Banner */}
-        <div className="bg-gradient-to-r from-red-600 to-red-700 py-3 text-center">
-          <div className="flex items-center justify-center gap-2 text-sm font-bold">
-            <Zap className="w-4 h-4 text-yellow-400" />
-            <span className="text-yellow-400">BLACK FRIDAY</span>
-            <span className="text-white">- JUSQU&apos;À -50%</span>
-            <Zap className="w-4 h-4 text-yellow-400" />
-          </div>
-        </div>
 
         {/* Login Form */}
         <div className="bg-white/10 backdrop-blur-lg border border-white/20 p-8">
