@@ -13,6 +13,7 @@ export interface Product {
   isAlmostSoldOut?: boolean;
   category: string;
   description: string;
+  dimensions?: string;
   availableCities: string[];
   primaryCity: string;
 }
@@ -35,6 +36,57 @@ export interface ApiProduct {
   "Ratio SKE": number | string;
   "Ratio Total": number | string;
   "TotalSalesValue": number;
+  "Dimensions"?: string;
+}
+
+// Function to extract dimensions from product name (libellé)
+function extractDimensionsFromLibelle(libelle: string): string | null {
+  if (!libelle) return null;
+  
+  // Common dimension patterns in French furniture names
+  const dimensionPatterns = [
+    // Pattern: "L x l x H cm" or "L x l x H"
+    /(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(?:cm)?/i,
+    // Pattern: "L x l cm" or "L x l"
+    /(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(?:cm)?/i,
+    // Pattern: "L cm" or "L"
+    /(\d+(?:\.\d+)?)\s*(?:cm)?/i,
+    // Pattern: "L x l x H mm" or "L x l x H"
+    /(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(?:mm)?/i,
+    // Pattern: "L x l mm" or "L x l"
+    /(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(?:mm)?/i,
+  ];
+  
+  for (const pattern of dimensionPatterns) {
+    const match = libelle.match(pattern);
+    if (match) {
+      if (match.length === 4) {
+        // Three dimensions: L x l x H
+        return `${match[1]} x ${match[2]} x ${match[3]} cm`;
+      } else if (match.length === 3) {
+        // Two dimensions: L x l
+        return `${match[1]} x ${match[2]} cm`;
+      } else if (match.length === 2) {
+        // One dimension: L
+        return `${match[1]} cm`;
+      }
+    }
+  }
+  
+  // If no pattern matches, try to extract any numbers that might be dimensions
+  const numberPattern = /(\d+(?:\.\d+)?)\s*(?:x\s*(\d+(?:\.\d+)?))?\s*(?:x\s*(\d+(?:\.\d+)?))?/i;
+  const numberMatch = libelle.match(numberPattern);
+  if (numberMatch) {
+    if (numberMatch[3]) {
+      return `${numberMatch[1]} x ${numberMatch[2]} x ${numberMatch[3]} cm`;
+    } else if (numberMatch[2]) {
+      return `${numberMatch[1]} x ${numberMatch[2]} cm`;
+    } else {
+      return `${numberMatch[1]} cm`;
+    }
+  }
+  
+  return null;
 }
 
 // Function to get the correct category based on API data
@@ -145,6 +197,7 @@ function transformApiProduct(apiProduct: ApiProduct): Product {
   };
 
   const { availableCities, primaryCity } = getAvailableCities(apiProduct);
+  const extractedDimensions = extractDimensionsFromLibelle(apiProduct["Libellé"]);
 
   return {
     id: apiProduct["Ref. produit"],
@@ -158,6 +211,7 @@ function transformApiProduct(apiProduct: ApiProduct): Product {
     isAlmostSoldOut,
     category: getCorrectCategory(apiProduct["Catégorie"]), // Use correct category mapping
     description: `${apiProduct["Libellé"]} - ${apiProduct["Catégorie"]}`,
+    dimensions: apiProduct["Dimensions"] || extractedDimensions,
     availableCities,
     primaryCity
   };
@@ -177,6 +231,7 @@ function transformDbProduct(dbProduct: any): Product {
     isAlmostSoldOut: dbProduct.isAlmostSoldOut,
     category: getCorrectCategory(dbProduct.categorie), // Use correct category mapping
     description: dbProduct.description || `${dbProduct.libelle} - ${dbProduct.categorie}`,
+    dimensions: dbProduct.dimensions || null,
     availableCities: dbProduct.availableCities,
     primaryCity: dbProduct.primaryCity
   };
@@ -227,6 +282,7 @@ function getFallbackProducts(): Product[] {
       isAlmostSoldOut: true,
       category: "Canapés",
       description: "Canapé d'angle premium en cuir véritable",
+      dimensions: "280 x 200 x 85 cm",
       availableCities: ["Casa", "Rabat"],
       primaryCity: "Casa"
     },
@@ -242,6 +298,7 @@ function getFallbackProducts(): Product[] {
       isAlmostSoldOut: false,
       category: "Tables",
       description: "Table basse artisanale en bois sculpté",
+      dimensions: "120 x 60 x 45 cm",
       availableCities: ["Frimoda", "Marrakech", "Tanger"],
       primaryCity: "Frimoda"
     },
@@ -257,6 +314,7 @@ function getFallbackProducts(): Product[] {
       isAlmostSoldOut: true,
       category: "Chambre",
       description: "Lit king size en bois massif de qualité supérieure",
+      dimensions: "200 x 200 x 60 cm",
       availableCities: ["Rabat"],
       primaryCity: "Rabat"
     },
@@ -272,6 +330,7 @@ function getFallbackProducts(): Product[] {
       isAlmostSoldOut: true,
       category: "Salons",
       description: "Ensemble salon complet 7 places",
+      dimensions: "350 x 280 x 85 cm",
       availableCities: ["Casa"],
       primaryCity: "Casa"
     },
@@ -287,6 +346,7 @@ function getFallbackProducts(): Product[] {
       isAlmostSoldOut: false,
       category: "Canapés",
       description: "Fauteuil club confortable en cuir",
+      dimensions: "95 x 95 x 85 cm",
       availableCities: ["Frimoda", "Casa", "Rabat", "Marrakech", "Tanger"],
       primaryCity: "Frimoda"
     },
@@ -302,6 +362,7 @@ function getFallbackProducts(): Product[] {
       isAlmostSoldOut: false,
       category: "Tables",
       description: "Table à manger extensible 8 personnes",
+      dimensions: "240 x 100 x 75 cm",
       availableCities: ["Frimoda", "Casa", "Bouskoura"],
       primaryCity: "Frimoda"
     },
@@ -317,6 +378,7 @@ function getFallbackProducts(): Product[] {
       isAlmostSoldOut: false,
       category: "Meubles",
       description: "Armoire 3 portes avec miroir",
+      dimensions: "200 x 60 x 220 cm",
       availableCities: ["Rabat", "Marrakech"],
       primaryCity: "Rabat"
     },
@@ -332,10 +394,85 @@ function getFallbackProducts(): Product[] {
       isAlmostSoldOut: true,
       category: "Jardin",
       description: "Ensemble jardin résistant aux intempéries",
+      dimensions: "300 x 200 x 75 cm",
       availableCities: ["Marrakech", "Tanger"],
       primaryCity: "Marrakech"
     }
   ];
+}
+
+// Function to get products by category
+export async function getProductsByCategory(category: string): Promise<Product[]> {
+  try {
+    console.log(`📦 Fetching products for category: ${category}`);
+    
+    const dbProducts = await prisma.product.findMany({
+      where: {
+        categorie: {
+          equals: category,
+          mode: 'insensitive'
+        },
+        totalStock: {
+          gt: 0 // Only products with stock
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: 20 // Limit to 20 products per category for performance
+    });
+    
+    console.log(`✅ Found ${dbProducts.length} products for category ${category}`);
+    
+    // Transform database products to our format
+    const products = dbProducts.map(transformDbProduct);
+    
+    return products;
+  } catch (error) {
+    console.error(`Error fetching products for category ${category}:`, error);
+    // Return empty array if database fails
+    return [];
+  }
+}
+
+// Function to get all available categories with product counts
+export async function getCategoriesWithCounts(): Promise<{ category: string; count: number }[]> {
+  try {
+    const categories = await prisma.product.groupBy({
+      by: ['categorie'],
+      where: {
+        totalStock: {
+          gt: 0
+        }
+      },
+      _count: {
+        categorie: true
+      },
+      orderBy: {
+        _count: {
+          categorie: 'desc'
+        }
+      }
+    });
+    
+    return categories.map(cat => ({
+      category: cat.categorie,
+      count: cat._count.categorie
+    }));
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    // Return fallback categories
+    return [
+      { category: 'Salons', count: 0 },
+      { category: 'Canapés', count: 0 },
+      { category: 'Chambre', count: 0 },
+      { category: 'Tables', count: 0 },
+      { category: 'Chaises', count: 0 },
+      { category: 'Jardin', count: 0 },
+      { category: 'Meubles', count: 0 },
+      { category: 'Déco', count: 0 }
+    ];
+  }
 }
 
 // Legacy export for backward compatibility

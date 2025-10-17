@@ -19,6 +19,7 @@ export interface ApiProduct {
   "Ratio SKE": number | string;
   "Ratio Total": number | string;
   "TotalSalesValue": number;
+  "Dimensions"?: string;
 }
 
 // Function to get the correct category based on API data
@@ -98,6 +99,56 @@ const getAvailableCities = (apiProduct: ApiProduct): { availableCities: string[]
   return { availableCities, primaryCity };
 };
 
+// Function to extract dimensions from product name (libellé)
+function extractDimensionsFromLibelle(libelle: string): string | null {
+  if (!libelle) return null;
+  
+  // Common dimension patterns in French furniture names
+  const dimensionPatterns = [
+    // Pattern: "L x l x H cm" or "L x l x H"
+    /(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(?:cm)?/i,
+    // Pattern: "L x l cm" or "L x l"
+    /(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(?:cm)?/i,
+    // Pattern: "L cm" or "L"
+    /(\d+(?:\.\d+)?)\s*(?:cm)?/i,
+    // Pattern: "L x l x H mm" or "L x l x H"
+    /(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(?:mm)?/i,
+    // Pattern: "L x l mm" or "L x l"
+    /(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(?:mm)?/i,
+  ];
+  
+  for (const pattern of dimensionPatterns) {
+    const match = libelle.match(pattern);
+    if (match) {
+      if (match.length === 4) {
+        // Three dimensions: L x l x H
+        return `${match[1]} x ${match[2]} x ${match[3]} cm`;
+      } else if (match.length === 3) {
+        // Two dimensions: L x l
+        return `${match[1]} x ${match[2]} cm`;
+      } else if (match.length === 2) {
+        // One dimension: L
+        return `${match[1]} cm`;
+      }
+    }
+  }
+  
+  // If no pattern matches, try to extract any numbers that might be dimensions
+  const numberPattern = /(\d+(?:\.\d+)?)\s*(?:x\s*(\d+(?:\.\d+)?))?\s*(?:x\s*(\d+(?:\.\d+)?))?/i;
+  const numberMatch = libelle.match(numberPattern);
+  if (numberMatch) {
+    if (numberMatch[3]) {
+      return `${numberMatch[1]} x ${numberMatch[2]} x ${numberMatch[3]} cm`;
+    } else if (numberMatch[2]) {
+      return `${numberMatch[1]} x ${numberMatch[2]} cm`;
+    } else {
+      return `${numberMatch[1]} cm`;
+    }
+  }
+  
+  return null;
+}
+
 // Function to sync products from API to database
 export async function syncProductsFromAPI(): Promise<{ success: boolean; count: number; error?: string }> {
   try {
@@ -125,6 +176,7 @@ export async function syncProductsFromAPI(): Promise<{ success: boolean; count: 
         const isAlmostSoldOut = apiProduct["Total Stock"] < 3;
         const correctCategory = getCorrectCategory(apiProduct["Catégorie"]);
         const { availableCities, primaryCity } = getAvailableCities(apiProduct);
+        const extractedDimensions = extractDimensionsFromLibelle(apiProduct["Libellé"]);
         
         // Upsert product (update if exists, create if not)
         await prisma.product.upsert({
@@ -152,6 +204,7 @@ export async function syncProductsFromAPI(): Promise<{ success: boolean; count: 
             availableCities,
             primaryCity,
             description: `${apiProduct["Libellé"]} - ${apiProduct["Catégorie"]}`,
+            dimensions: apiProduct["Dimensions"] || extractedDimensions,
             updatedAt: new Date()
           },
           create: {
@@ -177,7 +230,8 @@ export async function syncProductsFromAPI(): Promise<{ success: boolean; count: 
             stockWarehouse57: apiProduct["Stock Warehouse57"],
             availableCities,
             primaryCity,
-            description: `${apiProduct["Libellé"]} - ${apiProduct["Catégorie"]}`
+            description: `${apiProduct["Libellé"]} - ${apiProduct["Catégorie"]}`,
+            dimensions: apiProduct["Dimensions"] || extractedDimensions
           }
         });
         

@@ -2,7 +2,6 @@
 
 import React from "react";
 import ProductCard from "@/components/ProductCard";
-import WishlistFloatingButton from "@/components/WishlistFloatingButton";
 import WishlistToast from "@/components/WishlistToast";
 import { Product } from "@/lib/products";
 import { Clock, Zap, Gift, Star } from "lucide-react";
@@ -20,7 +19,6 @@ export default function HomePage({
 }: HomePageProps) {
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
-      <WishlistFloatingButton />
       <WishlistToast />
       {/* Add padding to account for fixed navbar */}
       <div className="pt-20">

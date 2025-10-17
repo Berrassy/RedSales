@@ -156,6 +156,15 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
 
+        {/* Dimensions Information */}
+        {product.dimensions && (
+          <div className="mb-3">
+            <div className="text-sm text-gray-600">
+              Dimensions: <span className="font-semibold text-gray-900">{product.dimensions}</span>
+            </div>
+          </div>
+        )}
+
         {/* Add to Cart Button */}
         <button 
           onClick={handleAddToCart}

@@ -2,11 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Menu, X, Zap, ShoppingCart, Heart, User, LogOut } from "lucide-react";
+import { Menu, X, Zap, ShoppingCart, User, LogOut } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/lib/hooks/useCart";
-import { useWishlist } from "@/lib/hooks/useWishlist";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -14,7 +13,6 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { cartCount } = useCart();
-  const { wishlistCount } = useWishlist();
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -24,8 +22,17 @@ export default function Navbar() {
       setIsScrolled(scrollTop > 50);
     };
 
+    const handleCloseMobileMenu = () => {
+      setIsOpen(false);
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('closeMobileMenu', handleCloseMobileMenu);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('closeMobileMenu', handleCloseMobileMenu);
+    };
   }, []);
 
   const categories = [
@@ -79,7 +86,8 @@ export default function Navbar() {
               width={180}
               height={60}
               priority
-              className="h-auto w-auto max-h-[60px]"
+              style={{ width: "auto", height: "auto" }}
+              className="max-h-[60px]"
             />
           </div>
 
@@ -101,20 +109,6 @@ export default function Navbar() {
 
           {/* Right Side Icons */}
           <div className="hidden lg:flex items-center gap-2">
-            {/* Wishlist Icon */}
-            <Link
-              href="/wishlist"
-              onClick={(e) => handleProtectedClick("/wishlist", e)}
-              className="relative p-2 text-white hover:text-red-400 transition-colors duration-200 hover:bg-red-500/10"
-            >
-              <Heart className="w-6 h-6" />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center">
-                  {wishlistCount}
-                </span>
-              )}
-            </Link>
-            
             {/* Cart Icon */}
             <Link
               href="/panier"
@@ -163,20 +157,6 @@ export default function Navbar() {
 
           {/* Mobile Icons & Menu Button */}
           <div className="lg:hidden flex items-center gap-2">
-            {/* Wishlist Icon Mobile */}
-            <Link
-              href="/wishlist"
-              onClick={(e) => handleProtectedClick("/wishlist", e)}
-              className="relative p-2 text-white hover:text-red-400 transition-colors duration-200"
-            >
-              <Heart className="w-5 h-5" />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-4 h-4 flex items-center justify-center text-[10px]">
-                  {wishlistCount}
-                </span>
-              )}
-            </Link>
-            
             {/* Cart Icon Mobile */}
             <Link
               href="/panier"
