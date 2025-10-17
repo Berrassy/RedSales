@@ -16,7 +16,7 @@ function getCorrectCategory(apiCategory: string): string {
   }
   
   // Table categories
-  if (category.includes('table basse') || category.includes('table de salle à manger') || category.includes('table d\'appoint') || category.includes('table de chevet')) {
+  if (category.includes('table basse') || category.includes('table de salle à manger') || category.includes('table d&apos;appoint') || category.includes('table de chevet')) {
     return 'Tables';
   }
   
@@ -36,7 +36,7 @@ function getCorrectCategory(apiCategory: string): string {
   }
   
   // Jardin/Extérieur categories
-  if (category.includes('jardin') || category.includes('exterieur') || category.includes('ensemble d\'exterieur') || category.includes('transat')) {
+  if (category.includes('jardin') || category.includes('exterieur') || category.includes('ensemble d&apos;exterieur') || category.includes('transat')) {
     return 'Jardin';
   }
   
@@ -76,10 +76,10 @@ function transformDbProduct(dbProduct: any) {
 
 export async function GET(
   request: Request,
-  { params }: { params: { category: string } }
+  { params }: { params: Promise<{ category: string }> }
 ) {
   try {
-    const { category } = params;
+    const { category } = await params;
     
     const dbProducts = await prisma.product.findMany({
       where: {
@@ -98,7 +98,7 @@ export async function GET(
     
     return NextResponse.json(products);
   } catch (error) {
-    console.error(`Error fetching products for category ${params.category}:`, error);
+    console.error(`Error fetching products for category:`, error);
     return NextResponse.json([]);
   }
 }

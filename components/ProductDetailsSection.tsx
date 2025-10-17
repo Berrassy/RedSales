@@ -81,7 +81,7 @@ export default function ProductDetailsSection({ product }: ProductDetailsSection
           <div className="flex items-center gap-1">
             <Zap className="w-4 h-4 text-yellow-500" />
             <span className="text-sm font-medium">
-              🔥 {viewCount} personnes ont vu ce produit aujourd'hui
+              🔥 {viewCount} personnes ont vu ce produit aujourd&apos;hui
             </span>
           </div>
         </div>

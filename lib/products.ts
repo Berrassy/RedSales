@@ -211,7 +211,7 @@ function transformApiProduct(apiProduct: ApiProduct): Product {
     isAlmostSoldOut,
     category: getCorrectCategory(apiProduct["Catégorie"]), // Use correct category mapping
     description: `${apiProduct["Libellé"]} - ${apiProduct["Catégorie"]}`,
-    dimensions: apiProduct["Dimensions"] || extractedDimensions,
+    dimensions: apiProduct["Dimensions"] || extractedDimensions || undefined,
     availableCities,
     primaryCity
   };
